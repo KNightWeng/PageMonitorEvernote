@@ -22,6 +22,9 @@ Available on Linux, Mac OSX and Windows
 
 Quick Start
 
+0.  Make sure your target platform installed "Chrome Browser"
+    https://www.google.com/intl/zh-TW/chrome/
+
 1. Get Node-webkit from https://github.com/rogerwang/node-webkit according to your platform OS.
 
 2. Copy all the files into PageMonitorEvernote folder.
