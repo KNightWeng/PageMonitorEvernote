@@ -1,7 +1,7 @@
 PackageMonitorEvernote
 ======================
+
 v0.0.1 : Fixed to trace http://joejoeyourmoney.pixnet.net/blog Comment field to get useful information and record into Evernote Notebook.
-======================
 
 An node-webkit application to monitor web page changes and record to Evernote 
 https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps
