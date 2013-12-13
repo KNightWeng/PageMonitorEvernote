@@ -8,6 +8,8 @@ var port = process.env.PORT || 1314;
 var callbackUrl = isProduction ? config.PRODUCTION_URL +'oauth_callback' : 'http://localhost:'+ port +'/oauth_callback';
 var emitter = new events.EventEmitter();
 var last_description = "";
+var show_description = "";
+var evernote_description = "";
 
 exports.main = function(req, res) {
     /*var client = new Evernote.Client({
@@ -88,11 +90,14 @@ emitter.on('page_load_complete', function(description, req, res){
 
 	if(last_description != description){
 		last_description = description;
-		newEverNote(description, req, res);
+		show_description = show_description.concat(description.concat("\n"));
+		
+		evernote_description = evernote_description.concat(description.concat("<br />"));
+		newEverNote(evernote_description, req, res);
 	}
 		
 	notes.push({
-                content: description,
+                content: show_description,
   	});
 
 	res.render('show', {
@@ -104,7 +109,7 @@ emitter.on('page_load_complete', function(description, req, res){
 	
 });
 
-function newEverNote(description, req, res){
+function newEverNote(evernote_description, req, res){
     	var client = new Evernote.Client({
         	token: req.session.oauthAccessToken,
         	sandbox: config.SANDBOX
@@ -115,12 +120,12 @@ function newEverNote(description, req, res){
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">',
         '<en-note>',
-        description,
+        evernote_description,
         '</en-note>'
     	].join('\n');
 
     	var note = new Evernote.Note();
-    	note.title = "Joe's Comment";
+    	note.title = getDateTime() + " Joe's comment";
     	note.content = enmlContent;
     	note.notebookGuid = req.session.slideNotebook.guid;
 
@@ -130,6 +135,30 @@ function newEverNote(description, req, res){
 	});
 }
 
+function getDateTime() {
+
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
+    return "[" + year + month + day + "]";
+
+}
 /*exports.newNote = function(req, res) {
     var defaultContent = [
         '<?xml version="1.0" encoding="UTF-8"?>',
