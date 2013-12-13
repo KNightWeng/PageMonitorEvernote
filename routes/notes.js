@@ -90,10 +90,10 @@ emitter.on('page_load_complete', function(description, req, res){
 
 	if(last_description != description){
 		last_description = description;
-		show_description = show_description.concat(description.concat("\n"));
+		show_description = show_description.concat(getDateTimeComment().concat(description.concat("\n")));
 		
-		evernote_description = evernote_description.concat(description.concat("<br />"));
-		newEverNote(evernote_description, req, res);
+		evernote_description = evernote_description.concat(getDateTimeComment().concat(description.concat("<br />")));
+		CreateEverNote(getDateTimeTitle() + " Joe's comment" ,evernote_description, req, res);
 	}
 		
 	notes.push({
@@ -109,7 +109,7 @@ emitter.on('page_load_complete', function(description, req, res){
 	
 });
 
-function newEverNote(evernote_description, req, res){
+function CreateEverNote(keyword, evernote_description, req, res){
     	var client = new Evernote.Client({
         	token: req.session.oauthAccessToken,
         	sandbox: config.SANDBOX
@@ -124,8 +124,9 @@ function newEverNote(evernote_description, req, res){
         '</en-note>'
     	].join('\n');
 
-    	var note = new Evernote.Note();
-    	note.title = getDateTime() + " Joe's comment";
+	var note = new Evernote.Note();
+
+    	note.title = getDateTimeTitle() + " Joe's comment";
     	note.content = enmlContent;
     	note.notebookGuid = req.session.slideNotebook.guid;
 
@@ -133,9 +134,43 @@ function newEverNote(evernote_description, req, res){
 		if(err)
 			process.stdout.write('Error@newEverNote\n');	
 	});
+
+    	/*var filter = new Evernote.NoteFilter();
+    	filter.notebookGuid = req.session.slideNotebook.guid;
+	filter.words = keyword;
+    	var offset = 0;
+
+    	noteStore.findNotesMetadata(filter, offset, 1, spec, function(err, response){
+        	var note = response.notes;
+
+		for(var i in note){
+    			note[i].title = getDateTimeTitle() + " Joe's comment";
+    			note[i].content = enmlContent;
+    			note[i].notebookGuid = req.session.slideNotebook.guid;
+
+    			noteStore.createNote(note[i], function(err, note){
+			if(err)
+				process.stdout.write('Error@newEverNote\n');
+			});
+		}	
+	});*/
 }
 
-function getDateTime() {
+function getDateTimeTitle() {
+    var date = new Date();
+
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
+    return "[" + year + month + day + "] ";
+}
+
+function getDateTimeComment() {
 
     var date = new Date();
 
@@ -148,17 +183,10 @@ function getDateTime() {
     var sec  = date.getSeconds();
     sec = (sec < 10 ? "0" : "") + sec;
 
-    var year = date.getFullYear();
-
-    var month = date.getMonth() + 1;
-    month = (month < 10 ? "0" : "") + month;
-
-    var day  = date.getDate();
-    day = (day < 10 ? "0" : "") + day;
-
-    return "[" + year + month + day + "]";
+    return "[" + hour + ":" +  min + ":" + sec + "] ";
 
 }
+
 /*exports.newNote = function(req, res) {
     var defaultContent = [
         '<?xml version="1.0" encoding="UTF-8"?>',
