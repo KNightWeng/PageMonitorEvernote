@@ -94,19 +94,17 @@ emitter.on('page_load_complete', function(description, req, res){
 		
 		evernote_description = evernote_description.concat(getDateTimeComment().concat(description.concat("<br />")));
 		CreateEverNote(getDateTimeTitle() + " Joe's comment" ,evernote_description, req, res);
-	}
-		
-	notes.push({
-                content: show_description,
-  	});
 
-	res.render('show', {
-            layout: 'layouts/layout',
-            title: 'PageMonitorEvernote: Comment',
-            note: notes
-        });
+		notes.push({
+                	content: show_description,
+  		});
 
-	
+		res.render('show', {
+            		layout: 'layouts/layout',
+            		title: 'PageMonitorEvernote: Comment',
+            		note: notes
+        	});
+	}	
 });
 
 function CreateEverNote(keyword, evernote_description, req, res){
