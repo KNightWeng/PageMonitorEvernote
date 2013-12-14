@@ -86,6 +86,7 @@ return (function() {
 }
 
 emitter.on('page_load_complete', function(description, req, res){
+	process.stdout.write('Get page_load_complete()\n');
 	var notes = [];
 
 	if(last_description != description){
@@ -108,6 +109,13 @@ emitter.on('page_load_complete', function(description, req, res){
 });
 
 function CreateEverNote(keyword, evernote_description, req, res){
+	if(req.session.oauthAccessToken)
+		process.stdout.write('Login@newEverNote\n');
+	else{
+		process.stdout.write('Not Login@newEverNote\n');
+		return;
+	}
+
     	var client = new Evernote.Client({
         	token: req.session.oauthAccessToken,
         	sandbox: config.SANDBOX

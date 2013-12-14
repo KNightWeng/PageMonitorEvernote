@@ -61,7 +61,7 @@ exports.oauth_callback = function(req, res) {
                 console.log(error);
                 res.redirect('/main');
             }
-            else {
+            else	
                 // create or get notebook
                 var client = new Evernote.Client({
                     token: oauthAccessToken,
@@ -91,7 +91,6 @@ exports.oauth_callback = function(req, res) {
                             req.session.edamExpires = results.edam_expires;
                             req.session.edamNoteStoreUrl = results.edam_noteStoreUrl;
                             req.session.edamWebApiUrlPrefix = results.edam_webApiUrlPrefix;
-                            res.redirect('/main');
                         });
                     }
                     else{
@@ -106,11 +105,10 @@ exports.oauth_callback = function(req, res) {
                         req.session.edamExpires = results.edam_expires;
                         req.session.edamNoteStoreUrl = results.edam_noteStoreUrl;
                         req.session.edamWebApiUrlPrefix = results.edam_webApiUrlPrefix;
-                        res.redirect('/main');
                     }
+		    res.redirect('/main');
                 });
             }
-        }
     );
 };
  
