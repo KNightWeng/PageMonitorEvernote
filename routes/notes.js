@@ -73,7 +73,7 @@ function update(req, res){
 return (function() {
 	var url = 'http://joejoeyourmoney.pixnet.net/blog';
 	var notes = [];
-	process.stdout.write('setInterval 5 mins alive...\n');
+	process.stdout.write(getDateTimeComment() + "setInterval 5 mins alive...\n");
 
 	request(url, function(err, resp, body){
   		$ = cheerio.load(body);
