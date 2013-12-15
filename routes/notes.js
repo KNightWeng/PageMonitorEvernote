@@ -12,36 +12,11 @@ var show_description = "";
 var evernote_description = "";
 
 exports.main = function(req, res) {
-    /*var client = new Evernote.Client({
-        token: req.session.oauthAccessToken,
-        sandbox: config.SANDBOX
-    });
-    var noteStore = client.getNoteStore();
-
-    var notes = [];
-    var filter = new Evernote.NoteFilter();
-    filter.notebookGuid = req.session.slideNotebook.guid;
-    filter.order = 2; //sort by UPDATED time
-    var offset = 0;
-    var spec = new Evernote.NotesMetadataResultSpec();
-    spec.includeTitle = true;
-
-    noteStore.findNotesMetadata(filter, offset, 20, spec, function(err, response){
-        var notesList = response.notes;
-        console.log(notesList);
-
-        for(var i in notesList){
-            notes.push({
-                guid: notesList[i].guid,
-                title: notesList[i].title
-            });
-        }*/
         res.render('main', {
             layout: 'layouts/layout',
             title: 'PageMonitorEvernote: Main'
         });
 
-    //});
 };
 
 exports.createNote = function(req, res) {
@@ -90,11 +65,12 @@ emitter.on('page_load_complete', function(description, req, res){
 	var notes = [];
 
 	if(last_description != description){
+		process.stdout.write('last_description != description\n');
 		last_description = description;
 		show_description = show_description.concat(getDateTimeComment().concat(description.concat("\n")));
 		
 		evernote_description = evernote_description.concat(getDateTimeComment().concat(description.concat("<br />")));
-		CreateEverNote(getDateTimeTitle() + " Joe's comment" ,evernote_description, req, res);
+		CreateEverNote(evernote_description, req, res);
 
 		notes.push({
                 	content: show_description,
@@ -108,11 +84,11 @@ emitter.on('page_load_complete', function(description, req, res){
 	}	
 });
 
-function CreateEverNote(keyword, evernote_description, req, res){
+function CreateEverNote(evernote_description, req, res){
 	if(req.session.oauthAccessToken)
-		process.stdout.write('Login@newEverNote\n');
+		process.stdout.write('Login@EverNote\n');
 	else{
-		process.stdout.write('Not Login@newEverNote\n');
+		process.stdout.write('Not Login@EverNote\n');
 		return;
 	}
 
@@ -122,7 +98,35 @@ function CreateEverNote(keyword, evernote_description, req, res){
     	});
     	var noteStore = client.getNoteStore();
 
-	var enmlContent = [
+	var hit = 'nhit';
+	var filter = new Evernote.NoteFilter();
+	filter.notebookGuid = req.session.slideNotebook.guid;
+	filter.words = "intitle:Joe's comment";
+	var offset = 0;
+	var spec = new Evernote.NotesMetadataResultSpec();
+    	spec.includeTitle = true;
+
+	noteStore.findNotesMetadata(filter, offset, 1, spec, function(err, response){
+		var notesList = response.notes;
+
+		for(var i in notesList){
+			hit = 'hit';
+			process.stdout.write('Joe\'s comment already exists...\n');
+			process.stdout.write(notesList[i].title);
+			process.stdout.write('\n');	
+			process.stdout.write(notesList[i].guid);
+			process.stdout.write('\n');
+			EditNote(noteStore, evernote_description, notesList[i].guid);
+		}
+	});
+
+	if(hit !== 'hit'){
+		process.stdout.write('Joe\'s comment not exists. Create New...\n');
+		CreateNewNote(noteStore, evernote_description, req, res);
+	}
+	
+
+	/*var enmlContent = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">',
         '<en-note>',
@@ -139,7 +143,7 @@ function CreateEverNote(keyword, evernote_description, req, res){
     	noteStore.createNote(note, function(err, note){
 		if(err)
 			process.stdout.write('Error@newEverNote\n');	
-	});
+	});*/
 
     	/*var filter = new Evernote.NoteFilter();
     	filter.notebookGuid = req.session.slideNotebook.guid;
@@ -162,6 +166,48 @@ function CreateEverNote(keyword, evernote_description, req, res){
 	});*/
 }
 
+function EditNote(noteStore, content, guid){
+	var enmlContent = [
+	'<?xml version="1.0" encoding="UTF-8"?>',
+	'<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">',
+ 	'<en-note>',
+	content,
+	'</en-note>'
+	].join('\n');
+
+	noteStore.getNote(guid, true, false, false, false, function(err, note){
+		process.stdout.write('noteStore.getNote()\n');
+		//process.stdout.write(note.content);
+		note.content = enmlContent;
+		noteStore.updateNote(note, function(err, note){
+			if(err)
+				process.stdout.write('Error@updateNote\n');	
+		});	
+	});
+}
+
+function CreateNewNote(noteStore, content, req, res){
+
+	var enmlContent = [
+	'<?xml version="1.0" encoding="UTF-8"?>',
+	'<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">',
+ 	'<en-note>',
+	content,
+	'</en-note>'
+	].join('\n');
+
+	var note = new Evernote.Note();
+
+	note.title = getDateTimeTitle() + " Joe's comment";
+	note.content = enmlContent;
+	note.notebookGuid = req.session.slideNotebook.guid;
+
+	noteStore.createNote(note, function(err, note){
+		if(err)
+			process.stdout.write('Error@CreateNewNote\n');	
+	});
+}
+
 function getDateTimeTitle() {
     var date = new Date();
 
@@ -180,6 +226,14 @@ function getDateTimeComment() {
 
     var date = new Date();
 
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
     var hour = date.getHours();
     hour = (hour < 10 ? "0" : "") + hour;
 
@@ -189,7 +243,7 @@ function getDateTimeComment() {
     var sec  = date.getSeconds();
     sec = (sec < 10 ? "0" : "") + sec;
 
-    return "[" + hour + ":" +  min + ":" + sec + "] ";
+    return "[" + year + "-" + month + "-" + day + " " + hour + ":" +  min + ":" + sec + "] ";
 
 }
 
