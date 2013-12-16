@@ -199,7 +199,7 @@ function CreateNewNote(noteStore, content, req, res){
 
 	var note = new Evernote.Note();
 
-	note.title = getDateTimeTitle() + " Joe's comment";
+	note.title = "Joe's comment";
 	note.content = enmlContent;
 	note.notebookGuid = req.session.slideNotebook.guid;
 
