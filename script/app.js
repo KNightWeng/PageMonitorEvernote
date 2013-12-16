@@ -45,7 +45,8 @@ app.get('/oauth_callback', routes.oauth_callback);
 app.get('/logout', routes.logout);
 
 app.get('/main', note.main);
-app.get('/main/refresh', note.refresh);
+app.get('/main/show', note.show);
+
 //app.get('/main/createNote', note.createNote);
 //app.get('/notes/new', note.newNote);
 //app.post('/notes', note.createNote);
@@ -88,5 +89,6 @@ var new_win = gui.Window.get(
 
 // And listen to new window's focus event
 new_win.on('focus', function() {
+  new_win.reload();
   console.log('New window is focused');
 });

@@ -38,14 +38,15 @@ exports.createNote = function(req, res) {
     });
 };
 
-exports.refresh = function(req, res) {
-	var functRef = update(req, res);
-	functRef();
-        setInterval(functRef, 300000);
+exports.show = function(req, res) {
+	//var functRef = update(req, res);
+	//functRef();
+        //setInterval(functRef, 300000);
+	update(req, res);
 };
 
 function update(req, res){
-return (function() {
+//return (function() {
 	var url = 'http://joejoeyourmoney.pixnet.net/blog';
 	var notes = [];
 	process.stdout.write(getDateTimeComment() + "setInterval 5 mins alive...\n");
@@ -57,7 +58,7 @@ return (function() {
 			emitter.emit('page_load_complete', $(link).text(), req, res);
   		});
 	});
-});
+//});
 }
 
 emitter.on('page_load_complete', function(description, req, res){

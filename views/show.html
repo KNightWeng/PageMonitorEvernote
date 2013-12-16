@@ -1,3 +1,14 @@
-{{#note}}
+<!DOCTYPE html>
+<head>
+<script type="text/JavaScript">
+function AutoRefresh(t) {
+	setInterval("location.reload(true);", t);
+}
+</script>
+</head>
+<body onload="JavaScript:AutoRefresh(300000);">
+  {{#note}}
     <textarea class="editor" name="content">{{content}}</textarea>
-{{/note}}
+  {{/note}}
+</body>
+</html>
