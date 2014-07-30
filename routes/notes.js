@@ -119,12 +119,12 @@ function CreateEverNote(evernote_description, req, res){
 			process.stdout.write('\n');
 			EditNote(noteStore, evernote_description, notesList[i].guid);
 		}
-	});
 
-	if(hit !== 'hit'){
-		process.stdout.write('Joe\'s comment not exists. Create New...\n');
-		CreateNewNote(noteStore, evernote_description, req, res);
-	}
+		if(hit !== 'hit'){
+			process.stdout.write('Joe\'s comment not exists. Create New...\n');
+			CreateNewNote(noteStore, evernote_description, req, res);
+		}
+	});
 	
 
 	/*var enmlContent = [
