@@ -47,13 +47,13 @@ exports.show = function(req, res) {
 
 function update(req, res){
 //return (function() {
-	var url = 'http://joejoeyourmoney.pixnet.net/blog';
+	var url = 'http://blog.moneydj.com/joe';
 	var notes = [];
 	process.stdout.write(getDateTimeComment() + "setInterval 5 mins alive...\n");
 
 	request(url, function(err, resp, body){
   		$ = cheerio.load(body);
-  		links = $('#banner h2'); //use your CSS selector here
+  		links = $('title'); //use your CSS selector here
   		$(links).each(function(i, link){
 			emitter.emit('page_load_complete', $(link).text(), req, res);
   		});
